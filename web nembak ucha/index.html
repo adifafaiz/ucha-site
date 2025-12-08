@@ -1,0 +1,508 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Untuk Ucha 💚</title>
+
+    <!-- Font -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+
+    <style>
+        :root{
+            --toska-1: #a0e6e8; /* background */
+            --toska-2: #7fd7d9; /* accent */
+            --toska-3: #2b6468; /* dark contrast */
+            --muted: #f7fffe;
+            --pink: #ff8ec7;
+        }
+
+        /* Basic layout */
+        *{box-sizing: border-box; -webkit-tap-highlight-color: transparent;}
+        body{
+            margin:0;
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(180deg, var(--toska-1) 0%, #c7f0ef 100%);
+            color: var(--toska-3);
+            min-height:100vh;
+            display:flex;
+            align-items:center;
+            justify-content:center;
+            padding:24px;
+            overflow-x:hidden;
+        }
+
+        #container{
+            width:100%;
+            max-width:680px;
+            background: rgba(255,255,255,0.65);
+            border-radius:18px;
+            padding:28px;
+            box-shadow: 0 10px 30px rgba(43,100,104,0.12);
+            backdrop-filter: blur(6px);
+            text-align:center;
+            position:relative;
+        }
+
+        /* Sparkle background small container */
+        .intro-note{
+            font-size:0.95rem;
+            color:rgba(43,100,104,0.9);
+            margin-bottom:10px;
+        }
+
+        #text{
+            font-size:1.35rem;
+            line-height:1.5;
+            min-height:72px;
+            margin-bottom:18px;
+            white-space:pre-line;
+            opacity:0;
+            transition: opacity 0.45s ease;
+        }
+
+        .fade-in{ opacity:1 !important; }
+
+        /* Buttons */
+        .btn {
+            display:inline-block;
+            border:none;
+            padding:12px 20px;
+            border-radius:12px;
+            font-weight:600;
+            cursor:pointer;
+            margin:8px 8px;
+            box-shadow: 0 6px 14px rgba(43,100,104,0.08);
+            user-select:none;
+        }
+
+        #nextBtn, #nextToPhoto {
+            background: linear-gradient(90deg,var(--toska-2), #66c7c8);
+            color: white;
+        }
+
+        #yesBtn{
+            background: linear-gradient(90deg,#62d0c9,#2bb5ad);
+            color:white;
+        }
+
+        #noBtn{
+            background:#f3f7f7;
+            color:var(--toska-3);
+            border:1px solid rgba(43,100,104,0.06);
+        }
+
+        /* Confetti squares */
+        .confetti {
+            position:fixed;
+            width:10px;
+            height:10px;
+            top:-10px;
+            z-index: 9999;
+            opacity:0.95;
+            border-radius:2px;
+            transform-origin: center;
+            animation: fall 3s linear forwards;
+        }
+
+        @keyframes fall {
+            to { transform: translateY(110vh) rotate(720deg); opacity: 0.9; }
+        }
+
+        /* Love floating */
+        .love {
+            position:fixed;
+            font-size:20px;
+            animation: floatUp 2.6s ease-out forwards;
+            z-index:9998;
+            pointer-events:none;
+            text-shadow: 0 2px 6px rgba(0,0,0,0.08);
+        }
+        @keyframes floatUp {
+            from { opacity:1; transform: translateY(0) scale(1); }
+            to   { opacity:0; transform: translateY(-140px) scale(1.3); }
+        }
+
+        /* Sparkle */
+        .sparkle {
+            position: fixed;
+            width:6px;
+            height:6px;
+            background: rgba(212,255,255,0.95);
+            border-radius:50%;
+            z-index: 1;
+            pointer-events: none;
+            animation: sparkleAnim 2s linear forwards;
+            box-shadow: 0 0 8px rgba(212,255,255,0.8);
+        }
+        @keyframes sparkleAnim {
+            from { opacity:1; transform: scale(1); }
+            to { opacity:0; transform: scale(3); }
+        }
+
+        /* Gallery grid */
+        #gallery{
+            display:none;
+            margin-top:18px;
+            text-align:left;
+        }
+        #gallery h3{
+            margin:6px 0 12px;
+            color:var(--toska-3);
+        }
+        .grid {
+            display:grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap:12px;
+        }
+        .photo{
+            width:100%;
+            display:block;
+            border-radius:12px;
+            box-shadow: 0 8px 20px rgba(43,100,104,0.08);
+            transform: translateY(8px);
+            opacity: 0;
+            transition: all 450ms cubic-bezier(.2,.9,.2,1);
+        }
+        .photo.show{ transform: translateY(0); opacity:1; }
+
+        /* Ending box */
+        #ending{
+            display:none;
+            margin-top:20px;
+            padding:18px;
+            border-radius:12px;
+            background: linear-gradient(180deg, rgba(255,255,255,0.85), rgba(255,255,255,0.6));
+            box-shadow: 0 6px 18px rgba(43,100,104,0.06);
+            text-align:center;
+        }
+        #ending h2{ color:var(--toska-3); margin:4px 0; }
+        #ending p{ margin:8px 0 0; color: rgba(43,100,104,0.85); font-size:1.05rem; }
+
+        /* responsive */
+        @media (max-width:520px){
+            #container{ padding:18px; border-radius:14px; }
+            #text{ font-size:1.05rem; }
+            .grid{ grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+
+<!-- Musik (letakkan bad.mp3 di folder yang sama) -->
+<audio id="bgm" loop>
+    <source src="bad.mp3" type="audio/mpeg">
+</audio>
+
+<div id="container" role="main" aria-labelledby="title">
+    <div class="intro-note">Untuk Ucha — buka pelan-pelan ya 💚</div>
+
+    <div id="text" aria-live="polite"> </div>
+
+    <div style="margin-top:8px;">
+        <button id="nextBtn" class="btn">Mulai</button>
+
+        <div id="choices" style="display:inline-block; vertical-align:middle;">
+            <button id="yesBtn" class="btn" style="display:none;">Boleh 😊</button>
+            <button id="noBtn" class="btn" style="display:none;">Nggak :(</button>
+        </div>
+
+        <button id="nextToPhoto" class="btn" style="display:none;">Next ➜</button>
+    </div>
+
+    <!-- GALERI (grid) -->
+    <div id="gallery" aria-hidden="true">
+        <h3>Foto-foto kita 😳💗</h3>
+        <div class="grid">
+            <img src="foto 3.jpg" alt="Foto kita 1" class="photo" id="p1">
+            <img src="foto 4.jpg" alt="Foto kita 2" class="photo" id="p2">
+            <img src="foto 5.jpg" alt="Foto kita 3" class="photo" id="p3">
+            <img src="foto 1.jpg" alt="Foto kita 4" class="photo" id="p4">
+            <img src="foto 2.jpg" alt="Foto kita 5" class="photo" id="p5">
+            <img src="foto 6.jpg" alt="Foto kita 6" class="photo" id="p6">
+            <img src="foto 7.jpg" alt="Foto kita 7" class="photo" id="p7">
+            <!-- bisa ditambah lagi -->
+        </div>
+    </div>
+
+    <!-- ENDING PAGE -->
+    <div id="ending" aria-hidden="true">
+        <h2>Terima kasih ya, Ucha 💚</h2>
+        <p>
+            Aku ngga percaya bisa sampai ke tahap ini, Kaya duluu tuh
+            aku cuma bisa mandangin kamu dari instagram,
+            Like foto kamuu,terus berharap bisa ketemu kamu di kampus..
+            tapii
+            Akhirnya aku bisa sampai dititik dimana aku akhirnya bisa
+            milikin kamu hehehe, Uchaa aku sayang banget sama kamu,
+            aku mau nunjukin ke kamu bahwa ngga semua cowo bercanda
+            sama kamu, Ada juga cowo yang bener bener sayang dan
+            ingin milikin kamu sepenuhnya, Pengen ngeliat senyum kamu,
+            Bahagianya kamu, Dan mengisi hari hari kamu, Mau itu kamu
+            pas sedih ataupun pas bahagia, Uchaa makasii yaa udah nerima
+            aku jadi pacar kamu, Aku berharap kedepannya kita bisa sama
+            sama menjalani hubungan ini dengan hal yang positif, Saling
+            support satu sama lain, Dan yang paling penting komunikasi,
+            Uchaa makasiii banyak udah nerima aku, Aku harap kita bisa
+            terus saling bersama yaaa hingga nanti ehem... hehehehehe
+            Btw coba tanya adif, Masa dia ngga mau ngasih kamu sesuatu
+            gitu??
+        </p>
+    </div>
+</div>
+
+<script>
+/* ========= Content & State ========= */
+const messages = [
+    "Halo, Ucha... 😊",
+    "Aku udah mikir lama buat bikin ini khusus buat kamu.",
+    "Ada hal yang pengen aku bilang dengan serius tapi juga deg-degan.",
+    "Ucha... aku suka sama kamu.",
+    "Mau jadi pacarku? 💚"
+];
+
+let index = 0;
+let noCount = 0;
+
+const textEl = document.getElementById("text");
+const nextBtn = document.getElementById("nextBtn");
+const choices = document.getElementById("choices");
+const yesBtn = document.getElementById("yesBtn");
+const noBtn = document.getElementById("noBtn");
+const nextToPhoto = document.getElementById("nextToPhoto");
+const bgm = document.getElementById("bgm");
+const gallery = document.getElementById("gallery");
+const ending = document.getElementById("ending");
+const photos = [document.getElementById("p1"), document.getElementById("p2"), document.getElementById("p3"), document.getElementById("p1"),document.getElementById("p2"), document.getElementById("p5"),document.getElementById("p6"),document.getElementById("p7")];
+
+/* initial micro-opening that blends original lines (option C: gabungkan) */
+document.addEventListener("DOMContentLoaded", () => {
+    // sparkle intro
+    sparkleIntro();
+
+    // show initial friendly lines in sequence, using typewriter
+    textEl.textContent = "haiii uchaaa 😆";
+    setTimeout(() => {
+        textEl.classList.add("fade-in");
+    }, 80);
+
+    setTimeout(() => {
+        textEl.classList.remove("fade-in");
+        setTimeout(() => {
+            typeWriter("akhirnyaaa hehehehe\nkamu udah siap belum niii😳🔥");
+        }, 300);
+    }, 2000);
+});
+
+/* ========= Typewriter ========= */
+function typeWriter(content, i = 0) {
+    // show with typing animation
+    textEl.classList.remove("fade-in");
+    let localIndex = 0;
+    textEl.textContent = "";
+    function step() {
+        if (localIndex <= content.length) {
+            textEl.textContent = content.slice(0, localIndex);
+            localIndex++;
+            setTimeout(step, 28);
+        } else {
+            // show after typing
+            textEl.classList.add("fade-in");
+        }
+    }
+    step();
+}
+
+/* ========= Sparkle Intro ========= */
+function sparkleIntro(){
+    for (let i = 0; i < 22; i++){
+        let s = document.createElement("div");
+        s.className = "sparkle";
+        s.style.left = Math.random() * 100 + "vw";
+        s.style.top = Math.random() * 85 + "vh";
+        s.style.opacity = (0.6 + Math.random()*0.6);
+        document.body.appendChild(s);
+        setTimeout(()=> s.remove(), 2000 + Math.random()*800);
+    }
+}
+
+/* ========= Next flow (Mulai) ========= */
+nextBtn.addEventListener("click", () => {
+    // music fade in
+    try {
+        bgm.volume = 0;
+        bgm.play().catch(()=>{}); // ignore play errors on some browsers
+        let v = 0;
+        const fade = setInterval(() => {
+            if (v < 0.95) { v += 0.03; bgm.volume = Math.min(v,1); }
+            else clearInterval(fade);
+        }, 120);
+    } catch(e){ /* ignore */ }
+
+    // advance through messages array using typewriter
+    if (index < messages.length) {
+        typeWriter(messages[index]);
+        index++;
+    }
+
+    // when finished showing last message, hide next and show choices
+    if (index >= messages.length) {
+        // small delay so last typewriter finishes
+        setTimeout(() => {
+            nextBtn.style.display = "none";
+            yesBtn.style.display = "inline-block";
+            noBtn.style.display = "inline-block";
+            // accessibility focus on yes
+            yesBtn.focus();
+        }, 850);
+    }
+});
+
+/* ========= YES flow ========= */
+yesBtn.addEventListener("click", () => {
+    startConfetti();
+    spawnLove();
+    loveExplosion(); // a burst of hearts near center
+
+    // nice alert + nickname prompt (keeps it playful)
+    setTimeout(() => {
+        alert("Yeayyy! Makasiiii banyak Ucha, akhirnya jadian jugaaa!!! 💗🥳");
+        let nickname = prompt("Sekarang kita udah jadian nih... ❤️\nUcha mau kita pake sebutan sayang apa?");
+        if (nickname) {
+            alert("Okeee! Mulai sekarang kita panggilannya: " + nickname + " 💕");
+        } else {
+            alert("Gapapa Cha, nanti kita cari bareng sebutannya 😆");
+        }
+    }, 450);
+
+    // update text and show next button to gallery
+    setTimeout(() => {
+        typeWriter("Makasih banyak ya Cha… aku seneng banget 😭💗\nAku juga masukin foto-foto kita ❤️");
+        yesBtn.style.display = "none";
+        noBtn.style.display = "none";
+        nextToPhoto.style.display = "inline-block";
+    }, 900);
+});
+
+/* ========= Next to photo (show gallery) ========= */
+nextToPhoto.addEventListener("click", () => {
+    nextToPhoto.style.display = "none";
+    // fade-in photos one by one
+    gallery.style.display = "block";
+    textEl.textContent = "Nih Cha, foto-foto kita 😳💗";
+    textEl.classList.add("fade-in");
+
+    // show photos with small delays for aesthetic
+    photos.forEach((p, i) => {
+        setTimeout(() => p.classList.add("show"), 250 + i * 250);
+    });
+
+    // after a while, hide gallery and show ending page
+    setTimeout(() => {
+        // leave gallery visible a bit, then show ending
+        gallery.style.opacity = 1;
+        setTimeout(() => {
+            gallery.style.display = "none";
+            ending.style.display = "block";
+            // final sparkles for ending
+            sparkleIntro();
+            typeWriter("Akhirnya kita resmi ya, Cha... Aku janji bakal jagain kamu. 💚");
+        }, 2800);
+    }, 3500);
+});
+
+/* ========= NO button playful behavior ========= */
+/* replace original click move with mouseover runaway for better UX */
+noBtn.addEventListener("mouseover", () => {
+    // move button to random place within container viewport
+    const containerRect = document.getElementById("container").getBoundingClientRect();
+    const btnW = noBtn.offsetWidth;
+    const btnH = noBtn.offsetHeight;
+
+    // compute random position inside container area
+    const padding = 14;
+    const maxLeft = Math.max(0, containerRect.width - btnW - padding);
+    const maxTop = Math.max(0, containerRect.height - btnH - padding);
+
+    const left = Math.random() * maxLeft;
+    const top = Math.random() * maxTop;
+
+    noBtn.style.position = "absolute";
+    noBtn.style.left = (containerRect.left + left + window.scrollX - containerRect.left) + "px";
+    noBtn.style.top = (containerRect.top + top - containerRect.top) + "px";
+});
+
+/* Also count clicks if somehow clicked */
+noBtn.addEventListener("click", () => {
+    noCount++;
+    if (noCount >= 4) {
+        noBtn.disabled = true;
+        noBtn.textContent = "uchaa 😔";
+        // gentle message after too many nos
+        typeWriter("Hmm... gapapa Cha. Aku tetep sayang kamu kok. 😊");
+    }
+});
+
+/* ========= Confetti ========= */
+function startConfetti(){
+    const colors = ["#ff8ec7", "#ffd6e7", "#66c7c8", "#b2fff7", "#8fe6d6", "#f9f3ff"];
+    for (let i=0; i<70; i++){
+        const c = document.createElement("div");
+        c.className = "confetti";
+        c.style.left = Math.random()*100 + "vw";
+        c.style.background = colors[Math.floor(Math.random()*colors.length)];
+        c.style.width = (6 + Math.random()*10) + "px";
+        c.style.height = (6 + Math.random()*10) + "px";
+        c.style.transform = `rotate(${Math.random()*360}deg)`;
+        document.body.appendChild(c);
+        setTimeout(()=> c.remove(), 3000 + Math.random()*800);
+    }
+}
+
+/* ========= Love floating ========= */
+function spawnLove(){
+    for (let i=0; i<18; i++){
+        const h = document.createElement("div");
+        h.className = "love";
+        h.textContent = "💚";
+        // spawn near bottom area, random x
+        h.style.left = Math.random()*85 + "vw";
+        h.style.top = (58 + Math.random()*30) + "vh";
+        h.style.fontSize = (16 + Math.random()*18) + "px";
+        document.body.appendChild(h);
+        setTimeout(()=> h.remove(), 2600);
+    }
+}
+
+/* small love explosion near center for YES click */
+function loveExplosion(){
+    const cx = window.innerWidth/2;
+    const cy = window.innerHeight/2 - 40;
+    for (let i=0;i<22;i++){
+        const d = document.createElement("div");
+        d.className = "love";
+        d.textContent = (i%2===0) ? "💗" : "💚";
+        d.style.left = (cx + (Math.random()*160 - 80)) + "px";
+        d.style.top = (cy + (Math.random()*80 - 40)) + "px";
+        d.style.fontSize = (12 + Math.random()*20) + "px";
+        // shorter float for explosion
+        d.style.animationDuration = (1.6 + Math.random()*1) + "s";
+        document.body.appendChild(d);
+        setTimeout(()=> d.remove(), 1800 + Math.random()*1000);
+    }
+}
+
+/* ========= Accessibility: allow keyboard to progress ========= */
+document.addEventListener("keydown", (e) => {
+    if (e.key === "Enter" || e.key === " ") {
+        // if start button visible, trigger it
+        if (nextBtn.style.display !== "none") {
+            nextBtn.click();
+        } else if (yesBtn.style.display !== "none") {
+            yesBtn.focus();
+        }
+    }
+});
+</script>
+</body>
+</html>
